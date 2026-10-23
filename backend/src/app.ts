@@ -7,9 +7,16 @@ export function createApp(): Express {
   const app = express();
 
   // Basic Middleware
+  const allowedOrigins = [env.CORS_ORIGIN, 'http://localhost:3000', 'http://127.0.0.1:3000'];
   app.use(
     cors({
-      origin: env.CORS_ORIGIN,
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(null, true);
+        }
+      },
       credentials: true,
     })
   );
