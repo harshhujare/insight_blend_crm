@@ -6,6 +6,9 @@ import { healthRouter } from './routes/health';
 import { clientsRouter } from './routes/clients';
 import { plansRouter, clientPlansRouter } from './routes/plans';
 import { contentItemsRouter } from './routes/contentItems';
+import { tasksRouter } from './routes/tasks';
+import { dashboardRouter } from './routes/dashboard';
+import { scriptsRouter } from './routes/scripts';
 
 export function createApp(): Express {
   const app = express();
@@ -38,6 +41,15 @@ export function createApp(): Express {
   app.use('/api/clients/:clientId/plans', clientPlansRouter);
   app.use('/api/plans', plansRouter);
   app.use('/api/content-items', contentItemsRouter);
+
+  // Task routes
+  app.use('/api/tasks', tasksRouter);
+
+  // Dashboard routes
+  app.use('/api/dashboard', dashboardRouter);
+
+  // Script routes
+  app.use('/api/scripts', scriptsRouter);
 
   return app;
 }

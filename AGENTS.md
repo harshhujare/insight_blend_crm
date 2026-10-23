@@ -34,3 +34,24 @@ Insight Blend is an internal web application for an organic social media marketi
 - UI handles loading, empty, success, and error states[cite: 1].
 - Terminal verification passed: typecheck (`tsc --noEmit`), linter, and Vitest test suite[cite: 1].
 - Update `@docs/PROGRESS.md` upon task approval.
+
+# Frontend UI/UX Instructions — Slack-Inspired Design System (`ui-ux-pro-max`)
+
+## 1. Mandatory Skill Activation
+- Before planning or writing any frontend component or page, you MUST load and follow the installed **`ui-ux-pro-max`** skill (check `.agent/skills/ui-ux-pro-max` or workspace skills).
+- Apply `ui-ux-pro-max` standards for visual hierarchy, micro-interactions, spacing consistency, WCAG AA contrast, keyboard navigation, and visible focus states (`NFR-08`).
+
+## 2. Slack-Inspired Workspace Architecture (`NFR-04`)
+Insight Blend takes direct UI inspiration from Slack: clean, approachable, high-density, organized, and effortless to scan.
+- **3-Pane Slack Layout:**
+  1. **Left Workspace Sidebar (`w-64`, dark aubergine `#19171D` / `#3F0E40`):** Workspace switcher header ("Insight Blend"), main navigation items (`Dashboard`, `All Clients`, `My Tasks`, `Script Reviews`), a collapsible **"Clients" channel list** rendered with `#` prefixes (e.g., `# acme-wellness`), and a bottom user profile bar showing role badge (`MANAGER`, `STRATEGIST`, `WRITER`) and logout.
+  2. **Sticky Channel Header (`h-14`, `#FFFFFF`, bottom border `#E2E2E2`):** Displays current view title (e.g., `# acme-wellness`), quick metadata pills (category, onboarding date, active status), filter bar, and primary action button.
+  3. **Main Canvas (`#F8F8F8` background with `#FFFFFF` cards/tables) + Right Thread Drawer (`w-96` / `max-w-lg` slide-over):** Open create/edit forms, task details, and script reviews inside a **Slack-style Right Thread Drawer** so users never lose context of the main list.
+
+## 3. Color & Status Token Rules
+- **Primary Action CTA:** Slack Green (`#007A5A`, hover `#148567`) for primary creation/approval buttons.
+- **Active Selection / Links:** Slack Blue (`#1264A3`, bg tint `#E8F5FA`).
+- **Danger / Overdue / Revision Requested:** Crimson (`#E01E5A`, bg tint `#FDF2F5`).
+- **Warning / In Review:** Amber (`#ECB22E`, bg tint `#FFFBEB`).
+- **Accessibility (`NFR-08`):** NEVER communicate workflow status, priority, or overdue state through color alone—always pair semantic badges with a distinct Lucide icon and clear text label.
+- **Required UI States (`FR-12`):** Every data view must include a shimmer loading skeleton, a helpful Slack-style empty state with clear CTA, and an inline retryable error banner.

@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { api } from '@/lib/api';
+import { Client } from '@/types/client';
 import {
   LayoutDashboard,
   Briefcase,
@@ -15,6 +17,8 @@ import {
   X,
   ShieldCheck,
   ChevronRight,
+  ChevronDown,
+  Hash,
 } from 'lucide-react';
 import { Role } from '@/types/auth';
 
@@ -27,7 +31,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { label: 'Clients', href: '/clients', icon: Briefcase },
+  { label: 'Clients Directory', href: '/clients', icon: Briefcase },
   { label: 'Tasks', href: '/tasks', icon: CheckSquare },
   { label: 'Scripts', href: '/scripts', icon: FileText },
   {
@@ -69,6 +73,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
+  // Active Client Channels in Sidebar
+  const [clientChannels, setClientChannels] = useState<Client[]>([]);
+  const [channelsLoading, setChannelsLoading] = useState(true);
+  const [channelsCollapsed, setChannelsCollapsed] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadClientChannels() {
+      try {
+        const data = await api.get<Client[]>('/clients', {
+          params: { status: 'ACTIVE' },
+        });
+        if (isMounted) {
+          setClientChannels(Array.isArray(data) ? data : []);
+        }
+      } catch {
+        // Silently tolerate if unauthenticated or network drop
+      } finally {
+        if (isMounted) {
+          setChannelsLoading(false);
+        }
+      }
+    }
+
+    loadClientChannels();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [pathname]);
+
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
@@ -94,9 +129,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   });
 
   const sidebarContent = (
-    <div className="flex h-full flex-col justify-between bg-[#1A1D21] text-slate-300">
+    <div className="flex h-full flex-col justify-between bg-[#19171D] text-slate-300">
       {/* Top Workspace Header */}
-      <div>
+      <div className="flex-1 overflow-y-auto">
         <div className="flex items-center justify-between border-b border-[#2d3136] px-4 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#4A154B] text-base font-bold text-white shadow-md">
@@ -145,7 +180,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        {/* Navigation Items */}
+        {/* Workspace Navigation Items */}
         <div className="mt-5 px-3">
           <div className="mb-2 px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
             Workspace
@@ -156,7 +191,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               const isActive =
                 item.href === '/'
                   ? pathname === '/'
-                  : pathname.startsWith(item.href);
+                  : pathname === item.href || (item.href === '/clients' && pathname === '/clients');
 
               return (
                 <Link
@@ -182,6 +217,73 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
+        </div>
+
+        {/* Slack-Inspired Collapsible Client Channels Section */}
+        <div className="mt-6 px-3">
+          <div className="flex items-center justify-between px-2 mb-1.5">
+            <button
+              type="button"
+              onClick={() => setChannelsCollapsed((prev) => !prev)}
+              className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:text-white transition-colors"
+              aria-expanded={!channelsCollapsed}
+            >
+              <ChevronDown
+                className={`h-3 w-3 transition-transform duration-200 ${channelsCollapsed ? '-rotate-90' : ''}`}
+              />
+              <span>Clients Channels</span>
+              {clientChannels.length > 0 && (
+                <span className="rounded-full bg-[#2d3136] px-1.5 py-0.2 text-[9px] font-semibold text-slate-300">
+                  {clientChannels.length}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {!channelsCollapsed && (
+            <div className="space-y-0.5 mt-1">
+              {channelsLoading ? (
+                <div className="space-y-2 px-2 py-1.5">
+                  <div className="h-4 w-3/4 rounded bg-slate-800/80 animate-pulse" />
+                  <div className="h-4 w-2/3 rounded bg-slate-800/80 animate-pulse" />
+                  <div className="h-4 w-4/5 rounded bg-slate-800/80 animate-pulse" />
+                </div>
+              ) : clientChannels.length === 0 ? (
+                <p className="px-2 py-1.5 text-[11px] text-slate-500 italic">No active clients</p>
+              ) : (
+                clientChannels.map((client) => {
+                  const isChannelActive = pathname === `/clients/${client.id}`;
+                  const slug = client.name
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/(^-|-$)/g, '');
+
+                  return (
+                    <Link
+                      key={client.id}
+                      href={`/clients/${client.id}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`group flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                        isChannelActive
+                          ? 'bg-[#1164A3] text-white shadow-xs'
+                          : 'text-slate-300 hover:bg-[#27242C] hover:text-white'
+                      }`}
+                      title={client.name}
+                    >
+                      <Hash
+                        className={`h-3.5 w-3.5 shrink-0 ${
+                          isChannelActive
+                            ? 'text-white'
+                            : 'text-slate-500 group-hover:text-slate-300'
+                        }`}
+                      />
+                      <span className="truncate">{slug}</span>
+                    </Link>
+                  );
+                })
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -216,7 +318,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="relative flex w-64 flex-col bg-[#1A1D21] shadow-2xl">
+          <div className="relative flex w-64 flex-col bg-[#19171D] shadow-2xl">
             {sidebarContent}
           </div>
         </div>
@@ -259,8 +361,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page Body */}
-        <main className="flex-1 p-4 md:p-8">{children}</main>
+        <main className="flex-1 p-4 md:p-8 bg-[#F8F8F8]">{children}</main>
       </div>
     </div>
   );
 }
+

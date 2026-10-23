@@ -14,19 +14,19 @@ Run ONE checkbox item per Antigravity Agent session. Mark `[x]` only after `type
 
 ## Milestone 3: Clients & Content Plans
 - [x] **CLI-01a (Backend)**: Client CRUD & archive API endpoints + validation + RBAC tests[cite: 1]
-- [x] **CLI-01b (Frontend)**: Client directory, create/edit modal, and archive view[cite: 1]
+- [x] **CLI-01b (Frontend)**: Slack-inspired client directory table, Right-Thread drawer, sidebar channels, workspace header, and archive view[cite: 1]
 - [x] **PLAN-01a (Backend)**: ContentPlan & ContentItem generation API (default 8 reels, 8 static posts, custom start date) + tests[cite: 1]
 - [ ] **PLAN-01b (Frontend)**: Client content plan view and item list UI[cite: 1]
 
 ## Milestone 4: Tasks & Dashboard
-- [ ] **TASK-01a (Backend)**: Task CRUD, assignment, status transitions, and overdue detection API + tests[cite: 1]
-- [ ] **TASK-01b (Frontend)**: Task management list, creation drawer, and status controls[cite: 1]
-- [ ] **DASH-01a (Backend)**: Dashboard summary counters and multi-filter query endpoints + tests[cite: 1]
+- [x] **TASK-01a (Backend)**: Task CRUD, assignment, status transitions, and overdue detection API + tests[cite: 1]
+- [x] **TASK-01b (Frontend)**: Task management list, creation drawer, and status controls[cite: 1]
+- [x] **DASH-01a (Backend)**: Dashboard summary counters and multi-filter query endpoints + tests[cite: 1]
 - [ ] **DASH-01b (Frontend)**: Slack-inspired central dashboard UI with filters (client, status, assignee, content type, due date)[cite: 1]
 
 ## Milestone 5: Script Review & Revision Loop
-- [ ] **SCRIPT-01a (Backend)**: Script draft save, anytime edit (`ScriptVersion` snapshot creation), and submit-for-review API + tests[cite: 1]
-- [ ] **SCRIPT-02a (Backend)**: Reviewer approve & request-revision API (requiring feedback comment) + `Review` history + RBAC tests[cite: 1]
+- [x] **SCRIPT-01a (Backend)**: Script draft save, anytime edit (`ScriptVersion` snapshot creation), and submit-for-review API + tests[cite: 1]
+- [x] **SCRIPT-02a (Backend)**: Reviewer approve & request-revision API (requiring feedback comment) + `Review` history + RBAC tests[cite: 1]
 - [ ] **SCRIPT-01b & 02b (Frontend)**: Script editor, version history viewer, and review/approval action panel[cite: 1]
 
 ## Milestone 6 & 7: Scheduling, QA & Release
