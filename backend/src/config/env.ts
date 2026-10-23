@@ -18,6 +18,7 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
   DATABASE_URL: z.string().url().optional(),
   DIRECT_URL: z.string().url().optional(),
+  JWT_SECRET: z.string().default('replace-with-a-long-random-local-secret'),
 });
 
 const parsed = envSchema.safeParse(process.env);

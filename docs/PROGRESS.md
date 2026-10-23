@@ -13,9 +13,9 @@ Run ONE checkbox item per Antigravity Agent session. Mark `[x]` only after `type
 - [ ] **AUTH-02**: Implement server-side RBAC middleware (`MANAGER`, `STRATEGIST`, `WRITER`) + unit/integration permission tests[cite: 1]
 
 ## Milestone 3: Clients & Content Plans
-- [ ] **CLI-01a (Backend)**: Client CRUD & archive API endpoints + validation + RBAC tests[cite: 1]
-- [ ] **CLI-01b (Frontend)**: Client directory, create/edit modal, and archive view[cite: 1]
-- [ ] **PLAN-01a (Backend)**: ContentPlan & ContentItem generation API (default 8 reels, 8 static posts, custom start date) + tests[cite: 1]
+- [x] **CLI-01a (Backend)**: Client CRUD & archive API endpoints + validation + RBAC tests[cite: 1]
+- [x] **CLI-01b (Frontend)**: Client directory, create/edit modal, and archive view[cite: 1]
+- [x] **PLAN-01a (Backend)**: ContentPlan & ContentItem generation API (default 8 reels, 8 static posts, custom start date) + tests[cite: 1]
 - [ ] **PLAN-01b (Frontend)**: Client content plan view and item list UI[cite: 1]
 
 ## Milestone 4: Tasks & Dashboard
