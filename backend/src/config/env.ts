@@ -17,6 +17,7 @@ const envSchema = z.object({
     .default('development'),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
   DATABASE_URL: z.string().url().optional(),
+  DIRECT_URL: z.string().url().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

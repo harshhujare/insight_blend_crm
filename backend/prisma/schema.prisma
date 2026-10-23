@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  MANAGER
+  STRATEGIST
+  WRITER
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ContentPlanStatus {
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum ContentType {
+  REEL
+  STATIC_POST
+}
+
+enum WorkflowStatus {
+  PLANNED
+  SCRIPT_DRAFT
+  IN_REVIEW
+  REVISION_REQUESTED
+  SCRIPT_APPROVED
+  READY_FOR_SHOOT
+  SHOOT_COMPLETED
+  EDITING
+  READY_TO_PUBLISH
+  PUBLISHED
+  ON_HOLD
+}
+
+enum ScriptStatus {
+  DRAFT
+  IN_REVIEW
+  REVISION_REQUESTED
+  APPROVED
+}
+
+enum ReviewDecision {
+  APPROVED
+  REVISION_REQUESTED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  COMPLETED
+  ON_HOLD
+}
+
+enum EntityType {
+  CLIENT
+  PLAN
+  CONTENT_ITEM
+  TASK
+  SCRIPT
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  ownedContentItems      ContentItem[]   @relation("ContentItemOwner")
+  assignedTasks          Task[]          @relation("TaskAssignee")
+  authoredScripts        Script[]        @relation("ScriptAuthor")
+  authoredScriptVersions ScriptVersion[] @relation("ScriptVersionAuthor")
+  reviews                Review[]        @relation("ReviewReviewer")
+  comments               Comment[]       @relation("CommentAuthor")
+  activityEvents         ActivityEvent[] @relation("ActivityActor")
+}
+
+model Client {
+  id             String       @id @default(uuid())
+  name           String
+  category       String
+  onboardingDate DateTime
+  status         ClientStatus @default(ACTIVE)
+  notes          String?      @db.Text
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  contentPlans ContentPlan[]
+  contentItems ContentItem[]
+  tasks        Task[]
+}
+
+model ContentPlan {
+  id               String            @id @default(uuid())
+  clientId         String
+  client           Client            @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  startDate        DateTime
+  endDate          DateTime
+  reelTarget       Int               @default(8)
+  staticPostTarget Int               @default(8)
+  status           ContentPlanStatus @default(ACTIVE)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  contentItems ContentItem[]
+}
+
+model ContentItem {
+  id                 String         @id @default(uuid())
+  clientId           String
+  client             Client         @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  planId             String
+  plan               ContentPlan    @relation(fields: [planId], references: [id], onDelete: Cascade)
+  type               ContentType
+  title              String
+  status             WorkflowStatus @default(PLANNED)
+  ownerId            String?
+  owner              User?          @relation("ContentItemOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  scriptDeadline     DateTime?
+  plannedShootDate   DateTime?
+  editingDeadline    DateTime?
+  plannedPublishDate DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  script Script?
+  tasks  Task[]
+}
+
+model Task {
+  id            String       @id @default(uuid())
+  title         String
+  description   String?      @db.Text
+  clientId      String
+  client        Client       @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  contentItemId String?
+  contentItem   ContentItem? @relation(fields: [contentItemId], references: [id], onDelete: SetNull)
+  assigneeId    String
+  assignee      User         @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: Restrict)
+  priority      TaskPriority @default(MEDIUM)
+  status        TaskStatus   @default(TODO)
+  dueDate       DateTime
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  comments Comment[]
+}
+
+model Script {
+  id             String       @id @default(uuid())
+  contentItemId  String       @unique
+  contentItem    ContentItem  @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+  currentText    String       @db.Text
+  authorId       String
+  author         User         @relation("ScriptAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  status         ScriptStatus @default(DRAFT)
+  currentVersion Int          @default(1)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  versions ScriptVersion[]
+  comments Comment[]
+}
+
+model ScriptVersion {
+  id            String   @id @default(uuid())
+  scriptId      String
+  script        Script   @relation(fields: [scriptId], references: [id], onDelete: Cascade)
+  versionNumber Int
+  textSnapshot  String   @db.Text
+  authorId      String
+  author        User     @relation("ScriptVersionAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  createdAt     DateTime @default(now())
+
+  reviews Review[]
+
+  @@unique([scriptId, versionNumber])
+}
+
+model Review {
+  id              String         @id @default(uuid())
+  scriptVersionId String
+  scriptVersion   ScriptVersion  @relation(fields: [scriptVersionId], references: [id], onDelete: Cascade)
+  reviewerId      String
+  reviewer        User           @relation("ReviewReviewer", fields: [reviewerId], references: [id], onDelete: Restrict)
+  decision        ReviewDecision
+  feedback        String?        @db.Text
+  reviewedAt      DateTime       @default(now())
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  authorId  String
+  author    User     @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  scriptId  String?
+  script    Script?  @relation(fields: [scriptId], references: [id], onDelete: Cascade)
+  text      String   @db.Text
+  createdAt DateTime @default(now())
+}
+
+model ActivityEvent {
+  id         String     @id @default(uuid())
+  actorId    String
+  actor      User       @relation("ActivityActor", fields: [actorId], references: [id], onDelete: Restrict)
+  entityType EntityType
+  entityId   String
+  eventType  String
+  summary    String     @db.Text
+  metadata   Json?
+  createdAt  DateTime   @default(now())
+}

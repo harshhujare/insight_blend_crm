@@ -6,7 +6,7 @@ Run ONE checkbox item per Antigravity Agent session. Mark `[x]` only after `type
 - [x] **REQ-01**: Resolve open requirements and approve specification[cite: 1]
 - [x] **DOC-01 & DOC-02**: Inspect repo, confirm monorepo structure (`/frontend`, `/backend`), and document setup in `README.md` and `.env.example`[cite: 1]
 - [x] **INF-01**: Initialize Next.js frontend and Express/TypeScript backend, linting, typecheck scripts, env validation, and `/health` endpoint[cite: 1]
-- [ ] **DB-01**: Create PostgreSQL (Neon) ORM schema for the 10 core entities, run initial migration, and add seed script[cite: 1]
+- [x] **DB-01**: Create PostgreSQL (Neon) ORM schema for the 10 core entities, run initial migration, and add seed script[cite: 1]
 
 ## Milestone 2: Authentication & Permissions
 - [ ] **AUTH-01**: Implement authentication endpoints (login/logout/session) and Next.js login UI[cite: 1]
